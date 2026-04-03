@@ -48,6 +48,7 @@ This document tracks the real-world issues encountered during the development of
 <img width="985" height="196" alt="image" src="https://github.com/user-attachments/assets/c4fb9a70-0582-4097-abea-5be70858d968" />
 **Technical Insight**:The Red Hat ubi9/nginx-122 image is built using the S2I framework. By default, it checks the source directory (/opt/app-root/src) for buildable code. If it finds only an index.html (and not a full S2I structure), it prints a "Usage" message and shuts down gracefully.
 **Resolution**:By-pass the S2I detection logic by explicitly defining the Nginx execution command.
+
 <img width="296" height="62" alt="image" src="https://github.com/user-attachments/assets/d5cac4eb-f5a2-4a25-8e57-29743b1d84bc" />
 ```bash
 Exec=nginx -g "daemon off;"
@@ -55,9 +56,19 @@ Exec=nginx -g "daemon off;"
 
   
 ## 🌐 Section 3: Networking & Path Alignment
-  **Issue**: 
-**Technical Insight**:
-**Resolution**:
+
+### Port 8080 Collision
+**Issue**: bind: address already in use.
+<img width="865" height="58" alt="image" src="https://github.com/user-attachments/assets/d372c502-4313-4e35-9c59-b6876103b9b6" />
+**Technical Insight**:On RHEL, port 8080 is a "hot" port. It is commonly used by Cockpit (web console), various Java applications, or even the rootless Podman network driver (pasta).
+**Resolution**:Remapped the external host port to 8888 while keeping the internal container port at 8080 to match the UBI image's non-privileged port requirement.
+<img width="345" height="73" alt="image" src="https://github.com/user-attachments/assets/81b25055-91cd-42f4-8ae8-bdd1dfdaf263" />
+
+
+### 403 Forbidden (Directory Alignment)
+**Issue**: Nginx returns 403 even though files exist on the LVM volume.
+**Technical Insight**:Standard Nginx uses /usr/share/nginx/html. However, Red Hat UBI Nginx images are optimized for OpenShift and use /opt/app-root/src as the default root.
+**Resolution**:Re-align volume mapping to /opt/app-root/src.
 
 ## 🛡 Section 4: Systemd Safeguards
   **Issue**: 
