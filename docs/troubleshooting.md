@@ -59,18 +59,31 @@ Exec=nginx -g "daemon off;"
 
 ### Port 8080 Collision
 **Issue**: bind: address already in use.
+
 <img width="865" height="58" alt="image" src="https://github.com/user-attachments/assets/d372c502-4313-4e35-9c59-b6876103b9b6" />
+
 **Technical Insight**:On RHEL, port 8080 is a "hot" port. It is commonly used by Cockpit (web console), various Java applications, or even the rootless Podman network driver (pasta).
 **Resolution**:Remapped the external host port to 8888 while keeping the internal container port at 8080 to match the UBI image's non-privileged port requirement.
 <img width="345" height="73" alt="image" src="https://github.com/user-attachments/assets/81b25055-91cd-42f4-8ae8-bdd1dfdaf263" />
-
 
 ### 403 Forbidden (Directory Alignment)
 **Issue**: Nginx returns 403 even though files exist on the LVM volume.
 **Technical Insight**:Standard Nginx uses /usr/share/nginx/html. However, Red Hat UBI Nginx images are optimized for OpenShift and use /opt/app-root/src as the default root.
 **Resolution**:Re-align volume mapping to /opt/app-root/src.
+<img width="693" height="78" alt="image" src="https://github.com/user-attachments/assets/d10365f8-2f3f-444e-9d1d-9e3344b04343" />
+
 
 ## 🛡 Section 4: Systemd Safeguards
-  **Issue**: 
-**Technical Insight**:
-**Resolution**:
+### "start-limit-hit"
+**Issue**: Service entered failed (Result: start-limit-hit).
+<img width="830" height="75" alt="image" src="https://github.com/user-attachments/assets/2c963c89-a2a1-4762-b898-53b640104462" />
+**Technical Insight**:Systemd has a protection mechanism (StartLimitBurst). If a service fails to start multiple times (e.g., 5 times in 10 seconds), Systemd stops trying to prevent CPU/Log exhaustion.
+**Resolution**: 
+- 1. Resolve the underlying 126 or 403 error.
+  2. Reset the unit state to allow manual restarts.
+     ```bash
+     [danny@rhel /]$ sudo systemctl reset-failed web-server
+     ```
+
+Author: Danny (dn0218)
+  
