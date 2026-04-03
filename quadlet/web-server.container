@@ -1,0 +1,31 @@
+[Unit]
+Description=Danny's Secure Web Server with LVM-backed Storage(ENG)
+
+# Ensure LVM mount is ready before starting the container
+RequiresMountsFor=/var/lib/containers/storage/volumes/app_data
+
+[Container]
+Image=registry.access.redhat.com/ubi9/nginx-122:latest
+
+# Important: Path must align with container's default working directory
+# (UBI Nginx uses /opt/app-root/src)
+Volume=/var/lib/containers/storage/volumes/app_data:/opt/app-root/src:Z
+
+# Expose container port
+PublishPort=8888:8080
+
+[Service]
+
+# Execute LVM automation before container starts
+ExecStartPre=/usr/local/bin/lvm_auto_manager.sh \
+  -m /var/lib/containers/storage/volumes/app_data \
+  -d /dev/sda \
+  -v vg_test \
+  -l lv_web_data \
+  -s 2G
+
+Restart=always
+
+[Install]
+# Start automatically at boot
+WantedBy=multi-user.target
