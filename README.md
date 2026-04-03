@@ -78,3 +78,16 @@ xfs_growfs done
   Logical volume vg_test/lv_test successfully resized.
 --- Final State ---
 ```
+
+<img width="1057" height="498" alt="Screenshot 2026-04-03 145646" src="https://github.com/user-attachments/assets/c611540e-4156-4340-95bc-674704e25aa9" />
+
+<img width="1068" height="380" alt="Screenshot 2026-04-03 145658" src="https://github.com/user-attachments/assets/0a12efc4-f765-4f1e-874f-90e97a83ea30" />
+
+<img width="794" height="243" alt="Screenshot 2026-04-03 152313" src="https://github.com/user-attachments/assets/0e6b20a3-92b5-4aca-ad51-65ad89bc4a31" />
+
+
+
+
+
+
+
